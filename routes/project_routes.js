@@ -31,7 +31,7 @@ router.post('/collaborators/:id', [
    validateFields
 ], addCollaborator);
 
-router.delete('/collaborators/:id', [
+router.post('/del-collaborators/:id', [
    param('id', 'El proyecto no existe').isMongoId(),
    validateFields
 ], deleteCollaborator);

@@ -29,7 +29,7 @@ const getProject = async (req, res) => {
    const { id } = req.params;
 
    try {
-      const project = await Project.findById(id).populate('tasks');
+      const project = await Project.findById(id).populate('tasks').populate('collaborators', 'name email');
 
       if (!project) {
          return res.status(404).json({ msg: 'El proyecto no existe' });
@@ -131,7 +131,10 @@ const addCollaborator = async (req, res) => {
       await project.save();
       res.json({ msg: 'Colaborador agregado correctamente' });
    } catch (error) {
-
+      console.log(error);
+      res.status(500).json({
+         msg: 'Error inesperado'
+      });
    }
 }
 
@@ -155,7 +158,23 @@ const searchCollaborator = async (req, res) => {
 }
 
 const deleteCollaborator = async (req, res) => {
+   try {
+      const project = await Project.findById(req.params.id);
 
+      if (!project) {
+         return res.status(404).json({ msg: 'Proyecto no encontrado.' });
+      }
+
+      if (project.author.toString() !== req.user._id.toString()) {
+         return res.status(401).json({ msg: 'Acción no válida.' });
+      }
+
+      project.collaborators.pull(req.body.uid);
+      await project.save();
+      res.json({ msg: 'Colaborador eliminado correctamente' });
+   } catch (error) {
+
+   }
 }
 
 
