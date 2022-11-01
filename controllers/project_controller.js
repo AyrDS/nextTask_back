@@ -2,7 +2,12 @@ const Project = require('../models/project_model');
 const User = require('../models/user_model');
 
 const getProjects = async (req, res) => {
-   const projects = await Project.find().where('author').equals(req.user).select('-tasks');
+   const projects = await Project.find({
+      '$or': [
+         { collaborators: { $in: req.user } },
+         { author: { $in: req.user } }
+      ]
+   }).select('-tasks');
 
    res.json(projects);
 }
@@ -35,7 +40,7 @@ const getProject = async (req, res) => {
          return res.status(404).json({ msg: 'El proyecto no existe' });
       }
 
-      if (project.author.toString() !== req.user._id.toString()) {
+      if (project.author.toString() !== req.user._id.toString() && !project.collaborators.some(colab => colab._id.toString() === req.user._id.toString())) {
          return res.status(401).json({ msg: 'No tienes los permisos necesarios para acceder' });
       }
 
