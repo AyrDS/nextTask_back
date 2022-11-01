@@ -1,5 +1,5 @@
 const Project = require('../models/project_model');
-const Task = require('../models/task_model');
+const User = require('../models/user_model');
 
 const getProjects = async (req, res) => {
    const projects = await Project.find().where('author').equals(req.user).select('-tasks');
@@ -98,8 +98,60 @@ const deleteProjects = async (req, res) => {
    }
 }
 
-const newCollaborator = async (req, res) => {
+const addCollaborator = async (req, res) => {
 
+   const { email } = req.body;
+
+   try {
+      const project = await Project.findById(req.params.id);
+
+      if (!project) {
+         return res.status(404).json({ msg: 'Proyecto no encontrado.' });
+      }
+
+      if (project.author.toString() !== req.user._id.toString()) {
+         return res.status(401).json({ msg: 'Acción no válida.' });
+      }
+
+      const user = await User.findOne({ email }).select('-confirmed -createdAt -token -updatedAt ');
+
+      if (!user) {
+         return res.status(404).json({ msg: 'Usuario no encontrado.' })
+      }
+
+      if (project.author.toString() === user._id.toString()) {
+         return res.status(400).json({ msg: 'El creador del proyecto no puede ser colaborador.' })
+      }
+
+      if (project.collaborators.includes(user._id)) {
+         return res.status(400).json({ msg: 'El usuario ya pertenece al proyecto.' });
+      }
+
+      project.collaborators.push(user._id);
+      await project.save();
+      res.json({ msg: 'Colaborador agregado correctamente' });
+   } catch (error) {
+
+   }
+}
+
+const searchCollaborator = async (req, res) => {
+   const { email } = req.body;
+
+   try {
+      const user = await User.findOne({ email }).select('-confirmed -createdAt -token -updatedAt ');
+
+      if (!user) {
+         return res.status(404).json({ msg: 'Usuario no encontrado' })
+      }
+
+      res.json(user);
+   } catch (error) {
+      console.log(error);
+      res.status(500).json({
+         msg: 'Error inesperado'
+      });
+   }
 }
 
 const deleteCollaborator = async (req, res) => {
@@ -113,6 +165,7 @@ module.exports = {
    editProject,
    getProject,
    getProjects,
-   newCollaborator,
+   addCollaborator,
    newProject,
+   searchCollaborator,
 }

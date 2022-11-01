@@ -1,6 +1,6 @@
 const express = require('express');
 const { param } = require('express-validator');
-const { deleteCollaborator, deleteProjects, editProject, getProject, getProjects, newCollaborator, newProject } = require('../controllers/project_controller.js');
+const { deleteCollaborator, deleteProjects, editProject, getProject, getProjects, addCollaborator, newProject, searchCollaborator } = require('../controllers/project_controller.js');
 const { checkAuth, validateFields } = require('../middlewares');
 const router = express.Router();
 
@@ -24,12 +24,14 @@ router.delete('/:id', [
    validateFields
 ], deleteProjects);
 
-router.get('/new-collaborator/:id', [
+router.post('/collaborators', searchCollaborator)
+
+router.post('/collaborators/:id', [
    param('id', 'El proyecto no existe').isMongoId(),
    validateFields
-], newCollaborator);
+], addCollaborator);
 
-router.get('/delete-collaborator/:id', [
+router.delete('/collaborators/:id', [
    param('id', 'El proyecto no existe').isMongoId(),
    validateFields
 ], deleteCollaborator);
