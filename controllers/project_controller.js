@@ -34,7 +34,9 @@ const getProject = async (req, res) => {
    const { id } = req.params;
 
    try {
-      const project = await Project.findById(id).populate('tasks').populate('collaborators', 'name email');
+      const project = await Project.findById(id)
+         .populate({ path: 'tasks', populate: { path: 'completed', select: 'name' } })
+         .populate('collaborators', 'name email');
 
       if (!project) {
          return res.status(404).json({ msg: 'El proyecto no existe' });

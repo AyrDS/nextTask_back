@@ -113,7 +113,8 @@ const setState = async (req, res) => {
    const { id } = req.params;
 
    try {
-      const task = await Task.findById(id).populate('project');
+      const task = await Task.findById(id)
+         .populate('project');
 
       if (!task) {
          return res.status(404).json({ msg: 'La tarea no existe' });
@@ -124,9 +125,14 @@ const setState = async (req, res) => {
       }
 
       task.state = !task.state;
+      task.completed = req.user._id;
       await task.save();
 
-      res.json(task);
+      const taskSaved = await Task.findById(id)
+         .populate('project')
+         .populate('completed');
+
+      res.json(taskSaved);
 
    } catch (error) {
       console.log(error);
