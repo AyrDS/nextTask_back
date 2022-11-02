@@ -4,6 +4,9 @@ const dbConnection = require('../db/config.js');
 const usersRoutes = require('../routes/user_routes.js');
 const projectRoutes = require('../routes/project_routes.js');
 const tasksRoutes = require('../routes/task_routes.js');
+const http = require('http');
+const socketio = require('socket.io');
+const Sockets = require('./sockets_model.js');
 
 class Server {
 
@@ -15,10 +18,17 @@ class Server {
          projectPath: '/api/projects',
          taskPath: '/api/tasks'
       };
+
+      this.server = http.createServer(this.app);
+      this.io = socketio(this.server)
    }
 
    async connectDB() {
       await dbConnection();
+   }
+
+   socketsConfig() {
+      new Sockets(this.io);
    }
 
    middlewares() {
@@ -36,7 +46,9 @@ class Server {
 
       this.middlewares();
 
-      this.app.listen(this.port, () => {
+      this.socketsConfig();
+
+      this.server.listen(this.port, () => {
          console.log(`Server corriendo en puerto ${this.port}`);
       });
    }
