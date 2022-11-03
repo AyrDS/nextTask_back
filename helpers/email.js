@@ -4,18 +4,21 @@ const apiKey = process.env.EMAIL_API_KEY;
 
 const emailRegister = async ({ email, name, token }) => {
    sgMail.setApiKey(apiKey);
-
    const msg = {
       to: email,
       from: 'ayrtonds97@gmail.com',
-      subject: 'NextTask - Confirma tu cuenta',
+      subject: 'NexTask - Confirma tu cuenta',
       text: "Confirma tu cuenta en UpTask",
-      html: `<p>¡Hola ${name}! Confirma tu cuenta en UpTask</p>
-      <p>Tu cuenta ya esta casi lista, solo debes clickear en el siguiente enlace:</p>
-      <a href="${process.env.URL_FRONTEND}/confirmar/${token}">Confirmar cuenta</a>
-      
-      <p>Si no creaste esta cuenta, puedes ignorar este mensaje</p>
-      `
+      html: `
+      <div>
+         <p style="font-weight: bold; margin: 0; color: #0284c7;">¡Hola ${name}! Confirma tu cuenta en NexTask</p>
+         <p>Tu cuenta ya esta casi lista, solo debes clickear en el siguiente enlace:</p>
+         <a style="font-weight: bold; background-color: #0284c7; color: #fff; text-decoration: none; padding: 12px 12px; margin: 0 auto; border-radius: 3px;" href="${process.env.URL_FRONTEND}/confirmar/${token}">Confirmar cuenta</a>
+
+         <p style="font-weight: bold;">Si no creaste esta cuenta, puedes ignorar este mensaje.</p>
+      </div>
+      `,
+
    }
 
    sgMail.send(msg)
@@ -24,54 +27,31 @@ const emailRegister = async ({ email, name, token }) => {
       })
       .catch(e => console.log(e));
 
-   /* const transport = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      auth: {
-         user: process.env.EMAIL_USER,
-         pass: process.env.EMAIL_PASS
-      }
-   });
-
-   const info = await transport.sendMail({
-      from: '"UpTask - Administrador de Proyectos" <cuentas@uptask.com>',
-      to: email,
-      subject: "UpTask - Confirma tu cuenta",
-      text: "Confirma tu cuenta en UpTask",
-      html: `<p>¡Hola ${name}! Confirma tu cuenta en UpTask</p>
-      <p>Tu cuenta ya esta casi lista, solo debes clickear en el siguiente enlace:</p>
-      <a href="${process.env.URL_FRONTEND}/confirmar/${token}">Confirmar cuenta</a>
-      
-      <p>Si no creaste esta cuenta, puedes ignorar este mensaje</p>
-      `
-   }); */
-
-
 }
 
 const emailResetPassword = async ({ email, name, token }) => {
-   const transport = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      auth: {
-         user: process.env.EMAIL_USER,
-         pass: process.env.EMAIL_PASS
-      }
-   });
-
-   const info = await transport.sendMail({
-      from: '"UpTask - Administrador de Proyectos" <cuentas@uptask.com>',
+   sgMail.setApiKey(apiKey);
+   const msg = {
+      from: 'ayrtonds97@gmail.com',
       to: email,
-      subject: "UpTask - Cambio de contraseña",
+      subject: "NexTask - Cambio de contraseña",
       text: "Cambio de contraseña",
-      html: `<p style="color: #FF0000" >¡Hola ${name}! Sigue las instrucciones para cambiar tu contraseña</p>
-      <p>Solo debes clickear en el siguiente enlace:</p>
+      html: `
+      <div>
+         <p style="font-weight: bold; margin: 0; color: #0284c7;">¡Hola ${name}! Reestablece tu contraseña</p>
+         <p>Para reestablecer tu contraseña, clickea en el proximo enlace:</p>
+         <a style="font-weight: bold; background-color: #0284c7; color: #fff; text-decoration: none; padding: 12px 12px; margin: 0 auto; border-radius: 3px;" href="${process.env.URL_FRONTEND}/olvide-pass/${token}">Reestablecer contraseña</a>
 
-      <a href="${process.env.URL_FRONTEND}/olvide-pass/${token}">Cambiar contraseña</a>
-      
-      <p>Si no solicitaste este email, puedes ignorar este mensaje</p>
+         <p style="font-weight: bold;">Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+      </div>
       `
-   });
+   }
+
+   sgMail.send(msg)
+      .then(() => {
+         console.log('Email enviado');
+      })
+      .catch(e => console.log(e));
 }
 
 module.exports = {
